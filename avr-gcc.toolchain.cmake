@@ -121,6 +121,8 @@ macro(add_avr_executable target_name avr_mcu)
             ${CMAKE_OBJDUMP} -h -S ${elf_file} > ${lst_file}
 
         DEPENDS ${elf_file}
+
+		WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} 
     )
 
     # create hex file
@@ -128,9 +130,12 @@ macro(add_avr_executable target_name avr_mcu)
         OUTPUT ${hex_file}
 
         COMMAND
-            ${CMAKE_OBJCOPY} -j .text -j .data -O ihex ${elf_file} ${hex_file}
+            ${CMAKE_OBJCOPY} -j .text -j .data 
+			-O ihex ${elf_file} ${hex_file}
 
         DEPENDS ${elf_file}
+	
+		WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} 
     )
 
     add_custom_command(
@@ -140,6 +145,8 @@ macro(add_avr_executable target_name avr_mcu)
             ${AVR_SIZE} ${elf_file}
 
         DEPENDS ${elf_file}
+
+		WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} 
     )
 
     # build the intel hex file for the device
@@ -147,6 +154,7 @@ macro(add_avr_executable target_name avr_mcu)
         ${target_name}
         ALL
         DEPENDS ${hex_file} ${lst_file} "print-size-${elf_file}"
+		WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} 
     )
 
     set_target_properties(
