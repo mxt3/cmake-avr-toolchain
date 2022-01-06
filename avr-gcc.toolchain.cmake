@@ -61,6 +61,7 @@ set(CMAKE_STRIP        "${TOOLCHAIN_ROOT}/${TRIPLE}-strip${OS_SUFFIX}"   CACHE P
 set(CMAKE_RANLIB       "${TOOLCHAIN_ROOT}/${TRIPLE}-ranlib${OS_SUFFIX}"  CACHE PATH "ranlib"  FORCE)
 set(AVR_SIZE           "${TOOLCHAIN_ROOT}/${TRIPLE}-size${OS_SUFFIX}"    CACHE PATH "size"    FORCE)
 
+# What does this??
 set(CMAKE_EXE_LINKER_FLAGS "-L /usr/lib/gcc/avr/4.8.2")
 
 # avr uploader config
@@ -77,6 +78,7 @@ find_program(AVR_UPLOAD
 
 set(AVR_LINKER_LIBS "-lc -lm -lgcc -Wl,-lprintf_flt -Wl,-u,vfprintf")
 
+# target_name is mcu name, not 'target' in the sense of cmake
 macro(add_avr_executable target_name avr_mcu)
 
     set(elf_file ${target_name}-${avr_mcu}.elf)
@@ -85,7 +87,9 @@ macro(add_avr_executable target_name avr_mcu)
     set(lst_file ${target_name}-${avr_mcu}.lst)
 
     # create elf file
+	# this relies on built-in capabilities of cmake Makefile generator
     add_executable(${elf_file}
+		# ARGN holds all arguments past the expected ones
         ${ARGN}
     )
 
