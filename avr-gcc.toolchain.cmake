@@ -61,6 +61,17 @@ set(CMAKE_STRIP        "${TOOLCHAIN_ROOT}/${TRIPLE}-strip${OS_SUFFIX}"   CACHE P
 set(CMAKE_RANLIB       "${TOOLCHAIN_ROOT}/${TRIPLE}-ranlib${OS_SUFFIX}"  CACHE PATH "ranlib"  FORCE)
 set(AVR_SIZE           "${TOOLCHAIN_ROOT}/${TRIPLE}-size${OS_SUFFIX}"    CACHE PATH "size"    FORCE)
 
+# Set default C++ standard file
+set(CMAKE_CXX_STANDARD 14 CACHE STRING "C++ standard" FORCE)
+# You can override with the same command after importing the toolchain
+# by issuing a simular command
+# or by setting for a specific target (e.g. executable):
+#	set_property(TARGET tgt PROPERTY CXX_STANDARD 11)
+
+# Adhere to the standard
+set(CMAKE_CXX_EXTENSIONS OFF)
+# Again, you can override simillarly. See docs.
+
 # What does this??
 set(CMAKE_EXE_LINKER_FLAGS "-L /usr/lib/gcc/avr/4.8.2")
 
@@ -78,7 +89,6 @@ find_program(AVR_UPLOAD
 
 set(AVR_LINKER_LIBS "-lc -lm -lgcc -Wl,-lprintf_flt -Wl,-u,vfprintf")
 
-# target_name is mcu name, not 'target' in the sense of cmake
 macro(add_avr_executable target_name avr_mcu)
 
     set(elf_file ${target_name}-${avr_mcu}.elf)
@@ -92,12 +102,14 @@ macro(add_avr_executable target_name avr_mcu)
 		# ARGN holds all arguments past the expected ones
         ${ARGN}
     )
-
+	
+	# TODO: more work with defaults here: use compile options and append to the list?
+	# TODO: it's hard to manipulate the target from the CMakeLists.txt, because of the avr_mcu suffix
     set_target_properties(
         ${elf_file}
 
         PROPERTIES
-            COMPILE_FLAGS "-mmcu=${avr_mcu} -g -Os -w -std=gnu++11 -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics"
+            COMPILE_FLAGS "-mmcu=${avr_mcu} -g -Os -w -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics"
             LINK_FLAGS    "-mmcu=${avr_mcu} -Wl,-Map,${map_file} ${AVR_LINKER_LIBS}"
     )
 
